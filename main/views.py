@@ -31,7 +31,7 @@ def home(request):
             return redirect('home')      
         items = ToDoList.objects.filter(author=request.user)
 
-    return render(request, 'main/home.html', {'form': form,  'items_today':items_today, 'items': items})
+    return render(request, 'main/index.html', {'form': form,  'items_today':items_today, 'items': items})
 
 class CompletedTasks(ListView):
     model = ToDoList
