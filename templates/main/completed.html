@@ -1,0 +1,53 @@
+{% extends "main/base.html" %}
+{%load static%}
+{% block title %}Completed Tasks{% endblock %}
+{% block content %}
+{%if user.is_authenticated%}
+  {%if items%}
+  <p class="text-muted">Completed Tasks are deleted automatically 30 days after completion</p>
+  <a class="btn btn-danger" href="{%url 'delete_all'%}" style="margin-bottom:20px;">Delete All</a>
+  {%else%}
+  <p class="text-muted">You don't have any completed tasks just yet</p>
+  {%endif%}
+    <table class="table table-hover table-bordered">
+      {%if items%}
+      <tr>
+        <th>Task</th>
+        <th style="max-width: 10px;">Completed</th>
+        <th style="max-width: 10px;">Delete</th>
+      </tr>
+      {%for item in items%}
+      <tr>
+        <th>{{item.name}}</th>
+        <th>
+          {%if item.completed == False%}
+          <input class="form-check-input" type="checkbox" value="{{item.id}}" name="completed" value="clicked" id="completed" onchange="changeAttribute(this, this.checked)" data-pk="{{ item.pk }}"> 
+          {%else%}
+          <input class="form-check-input" type="checkbox" value="{{item.id}}" name="completed" value="clicked" id="completed" onchange="changeAttribute(this, this.checked)" data-pk="{{ item.pk }}" checked>
+          {%endif%}
+        </th>
+        <th><a href="{%url 'delete_item' item.id%}" class="btn btn-danger btn-sm">Delete</a></th>
+      </tr>
+      {%endfor%}
+      {%endif%}
+  </table>
+{%endif%}
+<script>
+    async function changeAttribute(t, v) {
+    let response = await postData('{% url "ready" %}', {
+        "value": v,
+        "name": t.name,
+        "pk": t.dataset.pk,
+    })
+    console.log(response)
+    if (response.success) {
+        let btn = _(`btn-completed-${t.dataset.pk}`)
+        console.log(v)
+        console.log(t.dataset.pk)
+      }
+      location.reload()
+    }
+
+</script>
+<script src="{%static 'js/modal.js'%}"></script>
+{% endblock content %}

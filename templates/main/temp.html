@@ -1,0 +1,53 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{%url 'home'%}">Blog</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          {%if user.is_authenticated%}
+          <li class="nav-item">
+            <a class="nav-link" href="{%url 'add_post'%}">Add Post</a>
+          </li>
+          {%else%}
+          <li class="nav-item">
+            <a class="nav-link" href="{%url 'members:register'%}">Register</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{%url 'members:login'%}">Login</a>
+          </li>
+          {%endif%}
+          
+        </ul>
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          {%if user.is_authenticated%}
+          <li class="nav-item">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                {%if post.author.profile_pic%}
+                <img src="{{user.profile.profile_pic.url}}" alt="" srcset="" class="rounded-circle" style="width: 30px; height: 30px;">
+                {%else%}
+                <img src="{%static 'images/default.jpg'%}" class="rounded-circle" alt="Profile picture" style="width: 30px; height: 30px;">
+                {%endif%}
+              </a>
+
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+              {%if user.profile.id%}
+              <li><a class="dropdown-item" href="{%url 'members:profile_page' user.profile.id%}">Show Profile Page</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{%url 'members:edit_profile_page' user.profile.id%}">Edit Profile</a></li>
+              {%else%}
+              <li><a class="dropdown-item" href="{%url 'members:create_profile_page'%}">Create Profile</a></li>
+              {%endif%}
+              <li><a class="dropdown-item" href="{%url 'members:edit_profile'%}">Setting</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{%url 'logout'%}">Logout</a></li>
+            </ul>
+          </li>
+          </li>
+          {%endif%}
+        </ul>
+      </div>
+    </div>
+  </nav>

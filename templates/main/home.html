@@ -1,0 +1,145 @@
+{% extends "main/base.html" %}
+{%load static%}
+{% block title %}Home{% endblock %}
+{% block content %}
+    <!-- Button trigger modal -->
+{%if user.is_authenticated%}
+<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddTask">
+  Add Task
+</button>
+<!-- Modal -->
+<div class="modal fade" id="AddTask" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addTaskLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="AddTaskLabel">Add a New Task</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="">
+      <div class="modal-body">
+              {%csrf_token%}
+              {{form.as_p}}
+      </div>
+      <div class="modal-footer">
+        <input type="submit" class="btn btn-primary" value="Add">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Dismiss</button>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="TaskDetails"  data-bs-keyboard="false" tabindex="-1" aria-labelledby="TaskDetailsLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form action="" method="post">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TaskDetailsLabel"></h5>
+        
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-more"></p>
+        <p class="modal-date"></p>
+          {%csrf_token%}
+          <br>
+      </div>
+      <div class="modal-footer">
+        </form>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Dismiss</button>
+      </div>
+    </div>
+    <form>
+  </div>
+</div>
+
+
+  <form action="home.html" method="POST">
+    <table class="table table-hover table-bordered" style="margin-top: 30px">
+      {%if items%}
+        <tr>
+          <th>Task</th>
+          <th style="max-width:5px">Completed</th>
+      </tr>
+      {{days_left}}
+      {%for item in items%}
+      <tr>
+          <th><a type="button" data-bs-toggle="modal" data-bs-target="#TaskDetails" 
+            data-bs-name="{{item.name}}"
+            data-bs-more="{{item.task_body}}"
+            data-bs-completed="{{item.completed}}"
+            data-bs-date="{{item.date_end}}">{{item.name}}</a></th>
+          <th>
+              {%if item.completed == False%}
+              <input class="form-check-input" type="checkbox" value="{{item.id}}" name="completed" value="clicked" id="completed" onchange="changeAttribute(this, this.checked)" data-pk="{{ item.pk }}"> 
+              {%else%}
+              <input class="form-check-input" type="checkbox" value="{{item.id}}" name="completed" value="clicked" id="completed" onchange="changeAttribute(this, this.checked)" data-pk="{{ item.pk }}" checked>
+              {%endif%}
+          </th>
+      </tr>
+      {%endfor%}
+      <!-- {%for item in items_today%}
+      <tr>
+          <th><a type="button" data-bs-toggle="modal" data-bs-target="#TaskDetails" 
+            data-bs-name="{{item.name}}"
+            data-bs-more="{{item.task_body}}"
+            data-bs-completed="{{item.completed}}">{{item.name}}</a></th>
+          <th>
+              {%if item.completed == False%}
+              <input class="form-check-input" type="checkbox" value="{{item.id}}" name="completed" value="clicked" id="completed" onchange="changeAttribute(this, this.checked)" data-pk="{{ item.pk }}"> 
+              {%else%}
+              <input class="form-check-input" type="checkbox" value="{{item.id}}" name="completed" value="clicked" id="completed" onchange="changeAttribute(this, this.checked)" data-pk="{{ item.pk }}" checked>
+              {%endif%}
+          </th>
+      </tr>
+      {%endfor%} -->
+      <!-- {{items_today}} -->
+      {%endif%}
+    </table>
+  </form>
+  {%else%}
+  <div class="d-flex justify-content-center">
+    <h1 class="mb-2">You are not logged in or registered.Log in <a href="{%url 'login'%}">here</a> or <a href="{%url 'register'%}">register</a></h1>
+  </div>
+{%endif%}
+    <script>
+      var TaskModal = document.getElementById('TaskDetails')
+      TaskModal.addEventListener('show.bs.modal', function (event) {
+
+      var button = event.relatedTarget
+
+      var name = button.getAttribute('data-bs-name')
+      var body = button.getAttribute('data-bs-more')
+      var completed = button.getAttribute('data-bs-completed')
+      var date_end = button.getAttribute('data-bs-date')
+
+      var modalTitle = TaskModal.querySelector('.modal-title')
+      var modalBody = TaskModal.querySelector('.modal-more')
+      var modalDate = TaskModal.querySelector('.modal-date')
+      
+      modalTitle.textContent = name
+      modalBody.textContent = body
+      modalDate.textContent = date_end
+    }) 
+
+    async function changeAttribute(t, v) {
+    let response = await postData('{% url "ready" %}', {
+        "value": v,
+        "name": t.name,
+        "pk": t.dataset.pk,
+    })
+    console.log(response)
+    if (response.success) {
+        let btn = _(`btn-completed-${t.dataset.pk}`)
+        console.log(v)
+        console.log(t.dataset.pk)
+      }
+      location.reload()
+    }
+    $(function () {
+      $("#datetimepicker").datetimepicker();
+    });
+    </script>
+    <script src="{%static 'js/modal.js'%}"></script>
+{% endblock content %}
